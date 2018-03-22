@@ -102,6 +102,24 @@ class LXCInstaller(Installer):
         if self._repo_url:
             guest.os.initargs.add_new().val = self._repo_url
 
+    def _init_dnf(self, guest):
+        guest.os.init = "/usr/bin/dnf"
+        guest.os.initargs.add_new().val = "-y"
+        if self._repo_version:
+            guest.os.initargs.add_new().val = "--releasever"
+            guest.os.initargs.add_new().val = self._repo_version
+        guest.os.initargs.add_new().val = "--forcearch"
+        guest.os.initargs.add_new().val = guest.os.arch
+        guest.os.initargs.add_new().val = "--nogpgcheck"
+        guest.os.initargs.add_new().val = "--setopt"
+        guest.os.initargs.add_new().val = "reposdir=%s" % self._target_tree
+        guest.os.initargs.add_new().val = "--repofrompath"
+        guest.os.initargs.add_new().val = "_virt_install,%s" % self._repo_url
+        guest.os.initargs.add_new().val = "--installroot"
+        guest.os.initargs.add_new().val = self._target_tree
+        guest.os.initargs.add_new().val = "install"
+        guest.os.initargs.add_new().val = "@core"
+
     ##########################
     # Public installer impls #
     ##########################
@@ -141,6 +159,8 @@ class LXCInstaller(Installer):
         if isinstall:
             if self._repo_type == "deb":
                 self._init_debootstrap(guest);
+            elif self._repo_type == "repomd":
+                self._init_dnf(guest);
             else:
                 raise ValueError(_("%s repositories are not supported") % self._repo_type)
         else:
