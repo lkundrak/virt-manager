@@ -86,6 +86,22 @@ class LXCInstaller(Installer):
     # Run the bootstrap in installer phase #
     ########################################
 
+    def _init_debootstrap(self, guest):
+        if re.match(r'i[4-9]86', guest.os.arch):
+            arch = "i386"
+        elif guest.os.arch == "x86_64":
+            arch = "amd64"
+        else:
+            arch = guest.os.arch
+
+        guest.os.init = "/usr/sbin/debootstrap"
+        guest.os.initargs.add_new().val = "--arch"
+        guest.os.initargs.add_new().val = arch
+        guest.os.initargs.add_new().val = self._repo_version
+        guest.os.initargs.add_new().val = self._target_tree
+        if self._repo_url:
+            guest.os.initargs.add_new().val = self._repo_url
+
     ##########################
     # Public installer impls #
     ##########################
@@ -123,7 +139,9 @@ class LXCInstaller(Installer):
         self._remove_installed_config(guest)
 
         if isinstall:
-            if True:
+            if self._repo_type == "deb":
+                self._init_debootstrap(guest);
+            else:
                 raise ValueError(_("%s repositories are not supported") % self._repo_type)
         else:
             self._restore_installed_config(guest)
