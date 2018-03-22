@@ -88,6 +88,7 @@ from virtinst.installer import (ContainerInstaller, ImportInstaller,
                                 PXEInstaller, Installer)
 
 from virtinst.distroinstaller import DistroInstaller
+from virtinst.lxcinstaller import LXCInstaller
 
 from virtinst.guest import Guest
 from virtinst.cloner import Cloner

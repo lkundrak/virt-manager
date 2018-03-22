@@ -44,6 +44,7 @@ from .deviceredirdev import VirtualRedirDevice
 from .devicerng import VirtualRNGDevice
 from .devicevideo import VirtualVideoDevice
 from .distroinstaller import DistroInstaller
+from .lxcinstaller import LXCInstaller
 from .domainblkiotune import DomainBlkiotune
 from .domainfeatures import DomainFeatures
 from .domainmemorybacking import DomainMemorybacking
