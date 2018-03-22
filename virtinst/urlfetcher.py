@@ -580,6 +580,10 @@ class Distro(object):
     _xen_kernel_paths = []
     version_from_content = []
 
+    _repo_type = None
+    _repo_url = None
+    _repo_version = None
+
     def __init__(self, fetcher, arch, vmtype):
         self.fetcher = fetcher
         self.type = vmtype
@@ -634,6 +638,12 @@ class Distro(object):
                 return self.fetcher.acquireFile(path)
         raise RuntimeError(_("Could not find boot.iso in %s tree." %
                            self.name))
+
+    def getRepoData(self):
+        if not self._repo_type:
+            raise RuntimeError(_("%s is not a repository." %
+                               self.fetcher.location))
+        return [self._repo_type, self._repo_url, self._repo_version]
 
     def _check_osvariant_valid(self, os_variant):
         return OSDB.lookup_os(os_variant) is not None
