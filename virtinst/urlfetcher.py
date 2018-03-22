@@ -1251,11 +1251,26 @@ class DebianDistro(Distro):
 
         return True
 
+    def _is_install_repo(self):
+        m = re.match("(.*/)dists/([^/]*)/*", self.fetcher.location)
+        if m is None:
+            return False;
+
+        if not self.fetcher.hasFile("Release"):
+            return False
+
+        self._repo_type = 'deb'
+        self._repo_url = m.group(1)
+        self._repo_version = m.group(2)
+
+        return True
+
     def isValidStore(self):
         return any(check() for check in [
             self._is_regular_tree,
             self._is_daily_tree,
             self._is_install_cd,
+            self._is_install_repo,
             ])
 
 
