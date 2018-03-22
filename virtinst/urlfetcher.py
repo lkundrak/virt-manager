@@ -822,6 +822,11 @@ class RedHatDistro(Distro):
             return "inst.repo"
         return "method"
 
+    def _check_repomd(self):
+        if self.fetcher.hasFile("repodata/repomd.xml"):
+            self._repo_type = 'repomd'
+            self._repo_url = self.fetcher.location
+            self._repo_version = self._version_number
 
 # Fedora distro check
 class FedoraDistro(RedHatDistro):
@@ -853,6 +858,7 @@ class FedoraDistro(RedHatDistro):
         if ver in ["development", "rawhide", "Rawhide"]:
             self._version_number = latest_vernum
             self.os_variant = latest_variant
+            self._check_repomd()
             return True
 
         # Dev versions can be like '23_Alpha'
@@ -874,6 +880,7 @@ class FedoraDistro(RedHatDistro):
             self.os_variant = "fedora" + str(vernum)
 
         self._version_number = vernum
+        self._check_repomd()
         return True
 
 
@@ -893,13 +900,18 @@ class RHELDistro(RedHatDistro):
 
             if ret:
                 self._variantFromVersion()
+                self._check_repomd()
             return ret
 
         if (self.fetcher.hasFile("Server") or
             self.fetcher.hasFile("Client")):
             self.os_variant = "rhel5"
+            self._check_repomd()
             return True
-        return self.fetcher.hasFile("RedHat")
+
+        if self.fetcher.hasFile("RedHat"):
+            self._check_repomd()
+            return True
 
 
     ################################
@@ -985,6 +997,7 @@ class CentOSDistro(RHELDistro):
                 new_variant = self.os_variant.replace("rhel", "centos")
                 if self._check_osvariant_valid(new_variant):
                     self.os_variant = new_variant
+            self._check_repomd()
         return ret
 
 
@@ -1005,6 +1018,7 @@ class SLDistro(RHELDistro):
 
             if ret:
                 self._variantFromVersion()
+                self._check_repomd()
             return ret
 
         return self.fetcher.hasFile("SL")
